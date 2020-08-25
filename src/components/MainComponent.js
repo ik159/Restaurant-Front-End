@@ -1,28 +1,34 @@
 import React, { Component } from 'react';
 import MenuComponent from './MenuComponent';
-import { DISHES } from '../shared/dishes';
-import { LEADERS } from '../shared/leaders';
-import { PROMOTIONS } from '../shared/promotions';
-import { COMMENTS } from '../shared/comments';
 import DishDetail from './DishdetailComponent';
 import HeaderComponent from './HeaderComponent'
 import FooterComponent from './FooterComponent';
-import { Switch, Redirect, Route } from 'react-router-dom';
+import { Switch, Redirect, Route ,withRouter } from 'react-router-dom';
 import HomeComponent from './HomeComponent';
 import Contact from './ContactComponent';
 import About from './AboutComponent';
+import {  connect } from 'react-redux';
+
+
+
+
+
+
+const mapStateToProps = state => {
+  return {
+    dishes: state.dishes,
+    comments: state.comments,
+    promotions: state.promotions,
+    leaders: state.leaders
+  }
+}
 
 export class Main extends Component {
 
 
   constructor(props) {
     super(props);
-    this.state = {
-      dishes: DISHES,
-      comments: COMMENTS,
-      promotions: PROMOTIONS,
-      leaders: LEADERS,
-    };
+    
 
   }
 
@@ -33,9 +39,9 @@ export class Main extends Component {
     const HomePage = () => {
       return (
         <HomeComponent
-          dish={this.state.dishes.filter((dish) => dish.featured)[0]}
-          promotion={this.state.promotions.filter((promo) => promo.featured)[0]}
-          leader={this.state.leaders.filter((leader) => leader.featured)[0]}
+          dish={this.props.dishes.filter((dish) => dish.featured)[0]}
+          promotion={this.props.promotions.filter((promo) => promo.featured)[0]}
+          leader={this.props.leaders.filter((leader) => leader.featured)[0]}
         />
       )
     }
@@ -44,8 +50,8 @@ export class Main extends Component {
 
     const DishWithId = ({match}) => {
         return(
-          <DishDetail dish={this.state.dishes.filter((dish) => dish.id === parseInt(match.params.dishID,10))[0]} 
-          comments={this.state.comments.filter((comment) => comment.dishId === parseInt(match.params.dishID,10))}
+          <DishDetail dish={this.props.dishes.filter((dish) => dish.id === parseInt(match.params.dishID,10))[0]} 
+          comments={this.props.comments.filter((comment) => comment.dishId === parseInt(match.params.dishID,10))}
           />
         );
     }
@@ -55,10 +61,10 @@ export class Main extends Component {
         <HeaderComponent />
         <Switch>
           <Route path='/home' component={HomePage} />
-          <Route exact path='/menu' component={() => <MenuComponent dishes={this.state.dishes} />} />
+          <Route exact path='/menu' component={() => <MenuComponent dishes={this.props.dishes} />} />
           <Route path='/menu/:dishID' component={DishWithId} />
           <Route path='/contactus' component={Contact} />
-          <Route path='/aboutus' component={() => <About leaders={this.state.leaders}/>} />
+          <Route path='/aboutus' component={() => <About leaders={this.props.leaders}/>} />
           <Redirect to='/home' />
         </Switch>
         <FooterComponent />
@@ -67,4 +73,4 @@ export class Main extends Component {
   }
 }
 
-export default Main
+export default withRouter(connect(mapStateToProps)(Main));
